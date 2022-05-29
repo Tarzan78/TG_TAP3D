@@ -146,6 +146,8 @@ public class GameManager : MonoBehaviour
     #region Enemies Mechanics
 
     //spawn controller 
+
+
     //depois criar um prefab de inimigo e por a escolher o target mais próximo e ir na direção dele basicamente 
 
     #endregion
