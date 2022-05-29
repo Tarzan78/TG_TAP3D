@@ -7,19 +7,25 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Camera mainCamera;
 
     [SerializeField] private GameObject unit_Prefab;
+    [SerializeField] private GameObject enemy_Prefab;
 
     private GameObject shooter;
 
-    private List<GameObject> squad = new List<GameObject>();
-    private List<GameObject> enemiesActive = new List<GameObject>();
+    public static List<GameObject> squad = new List<GameObject>();
+    public static List<GameObject> enemiesActive = new List<GameObject>();
     public static List<GameObject> bullets = new List<GameObject>();
 
     [SerializeField] private List<Transform> squadTransfroms = new List<Transform>();
+
+    private bool readyForNewSpawn = false;
+    private bool testEnemies = false;
 
     // Start is called before the first frame update
     void Start()
     {
         StartSquadUnits(5);
+
+        readyForNewSpawn = true;
     }
 
     // Update is called once per frame
@@ -35,6 +41,12 @@ public class GameManager : MonoBehaviour
 			{
                 Shoot(shooter.GetComponent<SquadUnity>());
 			}
+        }
+
+		if (readyForNewSpawn)
+		{
+            StartCoroutine(SpawnerControl(5f));
+            //Vector2 tempPos = RandomPointInAnnulus(new Vector2(0, 0), 25f, 27f);
         }
     }
 
@@ -116,9 +128,31 @@ public class GameManager : MonoBehaviour
         saquadUnity.shoot();
 
     }
-	#endregion
 
-	#region bullets mechanics
+    public static void DestroyDeadUnits()
+    {
+        List<GameObject> deadUnits = new List<GameObject>();
+
+        //get the dead Units
+        for (int i = 0; i < squad.Count; i++)
+        {
+            if (squad[i].GetComponent<SquadUnity>().dead)
+            {
+                deadUnits.Add(squad[i]);
+            }
+        }
+
+        for (int i = 0; i < deadUnits.Count; i++)
+        {
+            squad.Remove(deadUnits[i]);
+
+            Destroy(deadUnits[i]);
+        }
+    }
+
+    #endregion
+
+    #region bullets mechanics
 
     public static void DestroyDeadBullets()
 	{
@@ -145,10 +179,68 @@ public class GameManager : MonoBehaviour
 
     #region Enemies Mechanics
 
+    private Vector2 RandomPointInAnnulus(Vector2 origin, float minRadius, float maxRadius)
+    {
+        Vector2 randomDirection = (Random.insideUnitCircle + origin).normalized;
+
+        float  randomDistance = Random.Range(minRadius, maxRadius);
+
+        Vector2 point = origin + randomDirection * randomDistance;
+
+        if (testEnemies)
+        {
+            Debug.Log("Random pos for enemy -> " + point);
+            Debug.Log("Random direction for enemy -> " + randomDirection);
+            Debug.Log("max distance for enemy -> " + maxRadius);
+            Debug.Log("min distance for enemy -> " + minRadius);
+        }
+
+        return point;
+    }
+
     //spawn controller 
+    private IEnumerator SpawnerControl(float secForSpawn)
+    {
+        //disable spawn
+        readyForNewSpawn = false;
 
+        //get random point in radius 
+        Vector2 tempPos = RandomPointInAnnulus(new Vector2(0, 0), 25f, 27f);
 
-    //depois criar um prefab de inimigo e por a escolher o target mais próximo e ir na direção dele basicamente 
+		if (testEnemies)
+		{
+            Debug.Log("New pos for enemy -> " + tempPos);
+		}
+
+        //spawn
+        enemiesActive.Add(GameObject.Instantiate(enemy_Prefab, new Vector3(tempPos.x, 0, tempPos.y),new Quaternion()));
+
+        yield return new WaitForSeconds(secForSpawn); //will only call this after every 4 seconds
+
+        //trigger 
+        readyForNewSpawn = true;
+    }
+
+    public static void DestroyDeadEnemies()
+    {
+        List<GameObject> deadEnemies = new List<GameObject>();
+
+        //get the dead Enemies
+        for (int i = 0; i < enemiesActive.Count; i++)
+        {
+            if (enemiesActive[i].GetComponent<Enemy>().dead)
+            {
+                deadEnemies.Add(enemiesActive[i]);
+            }
+        }
+
+        for (int i = 0; i < deadEnemies.Count; i++)
+        {
+            enemiesActive.Remove(deadEnemies[i]);
+
+            Destroy(deadEnemies[i]);
+        }
+    }
 
     #endregion
 }

@@ -46,7 +46,7 @@ GameObject:
   - component: {fileID: 210709537711723469}
   m_Layer: 0
   m_Name: PlayerTest
-  m_TagString: Untagged
+  m_TagString: Squad_Unit
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -143,6 +143,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gunPos_Objt: {fileID: 210709536934411691}
   gun_Objt: {fileID: 211417070011125517}
+  dead: 0
 --- !u!1001 &5332616664603191656
 PrefabInstance:
   m_ObjectHideFlags: 0

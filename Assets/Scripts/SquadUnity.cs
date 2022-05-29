@@ -10,6 +10,8 @@ public class SquadUnity : MonoBehaviour
     private Transform gunPos;
     private Gun gun;
 
+    public bool dead;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -20,7 +22,10 @@ public class SquadUnity : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+		if (dead)
+		{
+            GameManager.DestroyDeadUnits();
+		}
     }
 
     public void shoot()
