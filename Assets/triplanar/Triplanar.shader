@@ -1,85 +1,93 @@
-Shader "Custom/CustomTriplanar"
+Shader "Unlit/Triplanar"
 {
     Properties
     {
-        _Color ("Color", Color) = (1,1,1,1)
-        _MainTex ("Albedo (RGB)", 2D) = "white" {}
-        _SecondaryTex ("SecondaryTex", 2D) = "white" {}
-        _Glossiness ("Smoothness", Range(0,1)) = 0.5
-        _Metallic ("Metallic", Range(0,1)) = 0.0
+        _TopTex("top", 2D) = "white" {}
+        _BottText("bot", 2D) = "white" {}
+        _DissolveTex("Dissolve", 2D) = "white" {}
+        _ErvaRange("ErvaRange", Range(-1,1)) = 0
     }
     SubShader
     {
         Tags { "RenderType"="Opaque" }
-        LOD 200
-
-        CGPROGRAM
-        // Physically based Standard lighting model, and enable shadows on all light types
-        #pragma surface surf Standard fullforwardshadows
-
-        // Use shader model 3.0 target, to get nicer looking lighting
-        #pragma target 3.0
-
-        sampler2D _MainTex;
-        sampler2D _SecondaryTex;
-
-        struct Input
+        
+        Pass
         {
-            float2 uv_MainTex;
-            float3 worldNormal;
-            float3 worldPos;
-        };
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
 
-        half _Glossiness;
-        half _Metallic;
-        fixed4 _Color;
+            #include "UnityCG.cginc"
+            #include "UnityLightingCommon.cginc"
 
-        // Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
-        // See https://docs.unity3d.com/Manual/GPUInstancing.html for more information about instancing.
-        // #pragma instancing_options assumeuniformscaling
-        UNITY_INSTANCING_BUFFER_START(Props)
-            // put more per-instance properties here
-        UNITY_INSTANCING_BUFFER_END(Props)
+            struct appdata
+            {
+                float4 pos : POSITION;
+                float4 normal : NORMAL;
+            };
 
-        void Unity_Rotate_Degress_float(float2 UV, float2 Center, float Rotation, out float2 Out) 
-        {
-            Rotation = Rotation * (3.1415926f/180.0f);
-            UV -= Center;
-            float s = sin(Rotation);
-            float c = cos(Rotation);
-            float2x2 rMatrix = float2x2(c, -s, s, c);
-            rMatrix *= 0.5;
-            rMatrix *= 0.5;
-            rMatrix = rMatrix * 2 - 1;
-            UV.xy = mul(UV.xy, rMatrix);
-            UV += Center;
-            Out = UV;
+            struct v2f
+            {
+                float4 vertex : SV_POSITION;
+                float3 wPos : TEXCOORD0;
+                float3 normalNoMundo : TEXCOORD1;
+
+                float4 color : COLOR;
+            };
+
+            sampler2D _TopTex;
+            float4 _TopTex_ST;
+
+            sampler2D _BottText;
+            float4 _BottText_ST;
+
+            sampler2D _DissolveTex;
+            float4 _DissolveTex_ST;
+
+            fixed _ErvaRange;
+
+            v2f vert(appdata v)
+            {
+                v2f o;
+
+                o.vertex = UnityObjectToClipPos(v.pos);
+                o.wPos = mul(unity_ObjectToWorld, v.pos);
+                o.normalNoMundo = UnityObjectToWorldNormal(v.normal).xyz;
+
+                // ligt
+                float lambertEfect = max(0, dot(o.normalNoMundo, _WorldSpaceLightPos0.xyz));
+
+                o.color = (lambertEfect + 0.2) * _LightColor0;
+
+                return o;
+            }
+
+            fixed4 frag(v2f i) : SV_TARGET
+            {
+                float3 triplanarUV = i.wPos;
+                float3 normalNoMundoRep = abs(i.normalNoMundo);
+
+                float4 x = tex2D(_BottText, triplanarUV.yz);
+                float4 y = tex2D(_BottText, triplanarUV.xz);
+                float4 z = tex2D(_BottText, triplanarUV.xy);
+
+                float4 pedraTex = x * normalNoMundoRep.x + y * normalNoMundoRep.y + z * normalNoMundoRep.z;
+
+                float4 xTop = tex2D(_TopTex, triplanarUV.yz);
+                float4 yTop = tex2D(_TopTex, triplanarUV.xz);
+                float4 zTop = tex2D(_TopTex, triplanarUV.xy);
+                float4 ervaTex = xTop * normalNoMundoRep.x + yTop * normalNoMundoRep.y + zTop * normalNoMundoRep.z;
+
+                float4 xDissolve = tex2D(_DissolveTex, triplanarUV.yz);
+                float4 yDissolve = tex2D(_DissolveTex, triplanarUV.xz);
+                float4 zDissolve = tex2D(_DissolveTex, triplanarUV.xy);
+                float4 dissolveTex = xDissolve * normalNoMundoRep.x + yDissolve * normalNoMundoRep.y + zDissolve * normalNoMundoRep.z;
+
+                float4 col = step(_ErvaRange * dissolveTex.x, i.normalNoMundo.y) * ervaTex + step(i.normalNoMundo.y, _ErvaRange * dissolveTex.x) * pedraTex;
+
+                return col * i.color;
+            }
+            ENDCG
         }
-
-        void surf (Input IN, inout SurfaceOutputStandard o)
-        {
-            float2 yz_proj = 0;
-            Unity_Rotate_Degress_float(IN.worldPos.yz, 0.5, 270, yz_proj);
-
-            fixed4 tp = tex2D(_MainTex, IN.worldPos.xz * .1);
-            fixed bt = tex2D(_SecondaryTex, IN.worldPos.xz * .1);
-            fixed4 lr = tex2D(_SecondaryTex, yz_proj * .1);
-            fixed4 fb = tex2D(_SecondaryTex, IN.worldPos.xz * .1);
-
-            fixed4 up_col = max(0, smoothstep(IN.worldNormal.y, IN.worldNormal.y - 0.1, 0.5) * tp);
-            fixed4 lo_col = max(0, smoothstep(-IN.worldNormal.y, -IN.worldNormal.y - 0.8, 0.5) * bt);
-            fixed4 si_col = IN.worldNormal.x * lr;
-            fixed4 fr_col = IN.worldNormal.z * fb;
-
-            // Albedo comes from a texture tinted by color
-            fixed4 c = (up_col + lo_col + abs(si_col) + abs(fr_col)) * _Color;
-            o.Albedo = c.rgb;
-            // Metallic and smoothness come from slider variables
-            o.Metallic = _Metallic;
-            o.Smoothness = _Glossiness;
-            o.Alpha = c.a;
-        }
-        ENDCG
     }
-    FallBack "Diffuse"
 }
