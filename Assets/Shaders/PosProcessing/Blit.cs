@@ -8,28 +8,28 @@ public class Blit : MonoBehaviour
 
     // A Material with the Unity shader you want to process the image with
     public Material matCircle;
-    public Material matStandart;
+    //public Material matStandart;
     private Material mat;
 
 	[Range(0.0f, 1.0f)] public float radius;
 
-	public bool showCircle = true;
+	//public bool showCircle = true;
 
 	private void Update()
 	{
 
 
-		if (showCircle)
-		{
-			//send info for Shader 
+		//if (showCircle)
+		//{
+		//	//send info for Shader 
 			matCircle.SetFloat("_Radius", radius);
 
 			mat = matCircle;
-		}
-		else
-		{
-			mat = matStandart;
-		}
+		//}
+		//else
+		//{
+		//	mat = matStandart;
+		//}
 	}
 
 	void OnRenderImage(RenderTexture src, RenderTexture dest)

@@ -53,6 +53,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletSpawn: {fileID: 7898397332951707258}
   bulletPrefab: {fileID: 6594939385891678303, guid: 19b3f81498eff8e4cb4ed12c4c31a0ba, type: 3}
+  ammo: {fileID: 5255234777636911847}
+  fireMaterial: {fileID: 2100000, guid: 6df2059ccb5d4ae47852d4d23453da5e, type: 2}
+  frostMaterial: {fileID: 2100000, guid: 5d91f63a09b4c71428fe4bb1930091d0, type: 2}
+  gunType: 0
 --- !u!1 &5255234771011451945
 GameObject:
   m_ObjectHideFlags: 0

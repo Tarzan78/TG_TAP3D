@@ -8,9 +8,10 @@ public class Bullet : MonoBehaviour
     public Vector3 direction = new Vector3();
     public bool inMovement = false;
     public bool dead = false;
+    public Gun.GunType bulletType;
 
-    // Update is called once per frame
-    void Update()
+	// Update is called once per frame
+	void Update()
     {
 		if (inMovement && !dead)
 		{
@@ -39,8 +40,9 @@ public class Bullet : MonoBehaviour
 
     private bool KillCondiction()
 	{
-		if (Vector3.Distance(new Vector3(0,0,0), this.transform.position) > 25)
+		if (Vector3.Distance(new Vector3(0,0,0), this.transform.position) > 10)
 		{
+            GameManager.IncrementScaredLevel();
             return true;
 		}
 		else
