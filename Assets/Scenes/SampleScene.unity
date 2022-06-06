@@ -478,15 +478,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 115a7c3fd998dcd4fa79014a01c31ff7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  matCircle: {fileID: 2100000, guid: cbec462eaee424b438d9348ce959bc0a, type: 2}
-  matStandart: {fileID: 2100000, guid: ab74b3d0ebbcae847bdc5aeaee72d4a8, type: 2}
-  radius: 0
-  showCircle: 1
+  matCircle: {fileID: 2100000, guid: d7a759241fbd2ed489e93f53c15ed576, type: 2}
+  radius: 1
 --- !u!1 &1052905971
 GameObject:
   m_ObjectHideFlags: 0
