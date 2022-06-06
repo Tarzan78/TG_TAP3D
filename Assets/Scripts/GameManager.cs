@@ -5,6 +5,9 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private Camera mainCamera;
+    //[SerializeField] private Material ppMaterial;
+
+    static float scaredLevel = 0; //[0;1]
 
     [SerializeField] private GameObject unit_Prefab;
     [SerializeField] private GameObject enemy_Prefab;
@@ -47,6 +50,13 @@ public class GameManager : MonoBehaviour
 		{
             StartCoroutine(SpawnerControl(5f));
             //Vector2 tempPos = RandomPointInAnnulus(new Vector2(0, 0), 25f, 27f);
+        }
+
+		if (scaredLevel < 1)
+		{
+            DecreaseScaredLevel();
+
+            UpdateRadiusInPP();
         }
     }
 
@@ -240,6 +250,36 @@ public class GameManager : MonoBehaviour
 
             Destroy(deadEnemies[i]);
         }
+    }
+
+    #endregion
+
+    #region Pos Processing 
+
+    static public void IncrementScaredLevel()
+	{
+        scaredLevel -= 0.2f;
+
+        //ppMaterial.SetFloat("_Radius", scaredLevel);
+    }
+
+    private void DecreaseScaredLevel()
+	{
+        scaredLevel += 0.2f * Time.deltaTime;
+
+		if (scaredLevel < 0)
+		{
+            scaredLevel = 0;
+		}
+        UpdateRadiusInPP();
+
+    }
+
+    private void UpdateRadiusInPP()
+	{
+        mainCamera.GetComponent<Blit>().radius = scaredLevel;
+
+        Debug.Log("scared Level -> " + scaredLevel);
     }
 
     #endregion

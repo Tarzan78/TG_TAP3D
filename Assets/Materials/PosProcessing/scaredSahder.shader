@@ -77,20 +77,33 @@ Shader "Hidden/scaredSahder"
                 float2 centerXY = float2(_MainTex_TexelSize.z / 2, _MainTex_TexelSize.w / 2);
                 float2 xy = i.uv;
 
-                if (isInside(centerXY, _MainTex_TexelSize.w * _Radius, xy)) {
-                    
+                if (!isInside(centerXY, _MainTex_TexelSize.w * _Radius, xy)) {
+                    //[0;1000 ]
                     float distanceCenter = sqrt((xy.x - centerXY.x) * (xy.x - centerXY.x) + (xy.y - centerXY.y) * (xy.y - centerXY.y));
 
-                    float percentage = PercentageOfFade(_MainTex_TexelSize.w * _Radius, 1, distanceCenter);
+                    distanceCenter /= _MainTex_TexelSize.w;
+
+                    //adapt the max to get more darker 
+
+                    float percentage = PercentageOfFade(/*_MainTex_TexelSize.w * */_Radius, 0.5, distanceCenter);
 
                     //fixed4 shader = fixed4(0, 0, 0, 1);
 
+                    //if (distanceCenter > 0.5 )
+                    //{
+                    //    col = fixed4(1,0,0,1);
+                    //}
+                    //else
+                    //{
+                    //    col = fixed4(1, 1, 0, 1);
+                    //
+                    //}
                     //shader *= percentage;
-                    float max = 1;
-                    //col *= (max - percentage);
-                    col.r = distanceCenter;
-                    col.g = distanceCenter;
-                    col.b = distanceCenter;
+                    //float max = 1;
+                    col *= (1 - percentage);
+                    //col.r = distanceCenter;
+                    //col.g = distanceCenter;
+                    //col.b = distanceCenter;
                     //col += shader;
                 }
 

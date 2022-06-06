@@ -42,6 +42,7 @@ public class Bullet : MonoBehaviour
 	{
 		if (Vector3.Distance(new Vector3(0,0,0), this.transform.position) > 25)
 		{
+            GameManager.IncrementScaredLevel();
             return true;
 		}
 		else
