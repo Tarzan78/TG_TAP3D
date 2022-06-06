@@ -7,7 +7,20 @@ public class Enemy : MonoBehaviour
     private GameObject target;
     private float speed = 10;
     public bool dead = false;
-    private bool testEnemy = true;
+    public bool dying = false;
+    private bool testEnemy = false;
+    private Gun.GunType killedWith;
+    [SerializeField] private GameObject matBody;
+    private Material mat;
+    [SerializeField] private Material fireDeathPrefab;
+    [SerializeField] private Material frostDeathPrefab;
+    private Material fireDeath;
+    private Material frostDeath;
+
+    //Deaths
+    private float disolveFire = 0;
+    private float disolveFrost = 1;
+
 
     // Start is called before the first frame update
     void Start()
@@ -31,14 +44,19 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-		if (!dead)
+		if (!dead && !dying)
 		{
             Movement(transform.forward, speed);
 		}
-		else
+		else if (dead)
 		{
             GameManager.DestroyDeadEnemies();
         }
+        else if (dying)
+		{
+            GetComponent<Animator>().enabled = false;
+            Dying();
+		}
     }
 
     private GameObject GetTarget()
@@ -70,7 +88,10 @@ public class Enemy : MonoBehaviour
         if (collision.gameObject.tag == "Bullet")
 		{
             collision.gameObject.GetComponent<Bullet>().dead = true;
-            dead = true;
+
+            killedWith = collision.gameObject.GetComponent<Bullet>().bulletType;
+
+            dying = true;
 		}
 
         if (collision.gameObject.tag == "Squad_Unit")
@@ -79,4 +100,46 @@ public class Enemy : MonoBehaviour
             dead = true;
         }
     }
+
+    private void Dying()
+	{
+		switch (killedWith)
+		{
+			case Gun.GunType.Frost:
+
+                //new mat
+                mat = new Material(frostDeathPrefab);
+
+                matBody.GetComponent<SkinnedMeshRenderer>().material = mat;
+
+                disolveFrost += 2 * (Time.deltaTime * -1);
+
+                matBody.GetComponent<SkinnedMeshRenderer>().material.SetFloat("_ErvaRange", disolveFrost);
+
+                if (disolveFrost <= -1)
+                {
+                    dead = true;    
+                }
+
+                break;
+			case Gun.GunType.Fire:
+                //new mat
+                mat = new Material(fireDeathPrefab);
+
+                matBody.GetComponent<SkinnedMeshRenderer>().material = mat;
+
+                disolveFire += 1 * Time.deltaTime;
+
+                matBody.GetComponent<SkinnedMeshRenderer>().material.SetFloat("_disolve", disolveFire);
+
+                if (disolveFire >= 1 )
+				{             
+                    dead = true;
+				}
+
+				break;
+			default:
+				break;
+		}
+	}
 }

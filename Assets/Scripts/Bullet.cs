@@ -8,9 +8,10 @@ public class Bullet : MonoBehaviour
     public Vector3 direction = new Vector3();
     public bool inMovement = false;
     public bool dead = false;
+    public Gun.GunType bulletType;
 
-    // Update is called once per frame
-    void Update()
+	// Update is called once per frame
+	void Update()
     {
 		if (inMovement && !dead)
 		{

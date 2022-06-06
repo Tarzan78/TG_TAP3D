@@ -774,7 +774,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 963194227}
   unit_Prefab: {fileID: 210709537711723464, guid: 7961fc5d24714704db99ddbda51c6289, type: 3}
-  enemy_Prefab: {fileID: 9176304782893459789, guid: 691ce4d93b057a34b9925fd433690f6e, type: 3}
+  enemy_Prefab: {fileID: 3174231606645729997, guid: 335f5600c0db39945b90c1e4f34df2ee, type: 3}
   squadTransfroms:
   - {fileID: 1274753203}
   - {fileID: 1128310956}
