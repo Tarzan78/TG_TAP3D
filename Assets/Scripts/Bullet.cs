@@ -40,7 +40,7 @@ public class Bullet : MonoBehaviour
 
     private bool KillCondiction()
 	{
-		if (Vector3.Distance(new Vector3(0,0,0), this.transform.position) > 25)
+		if (Vector3.Distance(new Vector3(0,0,0), this.transform.position) > 10)
 		{
             GameManager.IncrementScaredLevel();
             return true;

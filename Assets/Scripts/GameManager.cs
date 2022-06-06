@@ -1,13 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private Camera mainCamera;
     //[SerializeField] private Material ppMaterial;
+    [SerializeField] private TMP_Text points;
 
-    static float scaredLevel = 0; //[0;1]
+    static float scaredLevel = 1; //[0;1]
 
     [SerializeField] private GameObject unit_Prefab;
     [SerializeField] private GameObject enemy_Prefab;
@@ -22,6 +24,8 @@ public class GameManager : MonoBehaviour
 
     private bool readyForNewSpawn = false;
     private bool testEnemies = false;
+
+    static int pointsnumber = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -48,7 +52,8 @@ public class GameManager : MonoBehaviour
 
 		if (readyForNewSpawn)
 		{
-            StartCoroutine(SpawnerControl(5f));
+            float spawnTime = 5f - (pointsnumber * 0.3f);
+            StartCoroutine(SpawnerControl(spawnTime));
             //Vector2 tempPos = RandomPointInAnnulus(new Vector2(0, 0), 25f, 27f);
         }
 
@@ -58,6 +63,8 @@ public class GameManager : MonoBehaviour
 
             UpdateRadiusInPP();
         }
+
+        points.text = pointsnumber.ToString();
     }
 
 	#region Start Game
@@ -249,6 +256,8 @@ public class GameManager : MonoBehaviour
             enemiesActive.Remove(deadEnemies[i]);
 
             Destroy(deadEnemies[i]);
+
+            IncrementPoints();
         }
     }
 
@@ -283,4 +292,10 @@ public class GameManager : MonoBehaviour
     }
 
     #endregion
+
+    //points
+    static public void IncrementPoints()
+	{
+        pointsnumber += 1;
+	}
 }
